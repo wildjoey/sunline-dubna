@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Солнцепровод</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: deep-tech company site. One dark full-bleed hero with a rendered plasma torus,
+   then quiet light sections on a hairline grid; mono labels carry specs and data. */
+:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --ink:#0B0D10; --muted:#5D646F; --line:#DCDFE3;
+  --accent:#E8590C; --ok:#1C7C54; --bad:#B4372F;
+  --hero-bg:#DCE8F5; --hero-ink:#14223F; --hero-muted:#4E5B74; --hero-line:#C3D0E0; --hero-light:1;
+  --hero-grad:linear-gradient(180deg,#CBE0F4 0%,#E3EDF7 38%,#F9EADB 72%,#F8D2AC 100%);
+  --ill-bg:#EEF1F5; --ill-ink:#1B2333; --paper:#F4EAD0; --paper-ink:#3A3226; --sky-top:#CFE2F5; --sky-bot:#F9DDBE; --hill-1:#8FA0B8; --hill-2:#6E8099; --sea:#5B86B5;
+  --sans:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0C0E; --surface:#131519; --ink:#ECEDEF; --muted:#8B919B; --line:#23272D;
+  --accent:#FF7A2E; --ok:#4DBE8A; --bad:#EE7A70; color-scheme:dark;
+  --hero-bg:#0F1B36; --hero-ink:#F4F5F8; --hero-muted:#A9B2C6; --hero-line:#26365A; --hero-light:0; --ill-bg:#171B24; --ill-ink:#D9DCE3; --paper:#D9CBA8; --paper-ink:#2E281F; --sky-top:#1A2C55; --sky-bot:#7A4A4A; --hill-1:#2D3650; --hill-2:#232A40; --sea:#1E3557;
+  --hero-grad:linear-gradient(180deg,#0F1B36 0%,#1A2C55 45%,#3A3560 72%,#7A4A4A 92%,#B0643A 100%)}}
+:root[data-theme="dark"]{
+  --bg:#0B0C0E; --surface:#131519; --ink:#ECEDEF; --muted:#8B919B; --line:#23272D;
+  --accent:#FF7A2E; --ok:#4DBE8A; --bad:#EE7A70; color-scheme:dark;
+  --hero-bg:#0F1B36; --hero-ink:#F4F5F8; --hero-muted:#A9B2C6; --hero-line:#26365A; --hero-light:0; --ill-bg:#171B24; --ill-ink:#D9DCE3; --paper:#D9CBA8; --paper-ink:#2E281F; --sky-top:#1A2C55; --sky-bot:#7A4A4A; --hill-1:#2D3650; --hill-2:#232A40; --sea:#1E3557;
+  --hero-grad:linear-gradient(180deg,#0F1B36 0%,#1A2C55 45%,#3A3560 72%,#7A4A4A 92%,#B0643A 100%)}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-weight:500;letter-spacing:-.03em;text-wrap:balance;margin:0;line-height:1.05}
+h2{font-size:clamp(32px,4.4vw,56px)}
+h3{font-size:20px;letter-spacing:-.015em;line-height:1.25}
+p{margin:0}
+.lede{color:var(--muted);max-width:60ch}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:inherit}
+section{padding-block:44px 64px;scroll-margin-top:64px}
+section + section{border-top:1px solid var(--line)}
+.head{display:grid;grid-template-columns:240px 1fr;gap:32px;margin-bottom:40px}
+.head .label{padding-top:12px}
+.head .stack{display:flex;flex-direction:column;gap:20px}
+@media (max-width:860px){.head{grid-template-columns:1fr;gap:12px;margin-bottom:32px}section{padding-block:32px 48px}}
+
+.btn{font:500 15px var(--sans);border:0;border-radius:6px;padding:13px 20px;cursor:pointer;background:var(--ink);color:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn.light{background:var(--hero-ink);color:var(--hero-bg)}
+.link{font-weight:500;text-decoration:none;display:inline-flex;gap:8px;align-items:center;padding:13px 4px}
+.link::after{content:"→"}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* header (over the dark hero) */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--hero-bg) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--hero-line);color:var(--hero-ink)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--hero-bg)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px}
+.logo{font-weight:600;font-size:17px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--hero-ink)}
+.logo svg{width:22px;height:22px}
+.nav ul{display:flex;gap:28px;list-style:none;margin:0;padding:0;font-size:14px}
+.nav ul a{color:var(--hero-muted);text-decoration:none}
+.nav ul a:hover{color:var(--hero-ink)}
+.nav .btn{padding:9px 16px;font-size:14px}
+@media (max-width:820px){.nav ul{display:none}}
+
+/* hero */
+.hero{position:relative;background:var(--hero-grad);color:var(--hero-ink);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .wrap{position:relative;padding-block:40px 32px;display:flex;flex-direction:column;gap:40px}
+.hero-copy{max-width:640px;display:flex;flex-direction:column;gap:22px}
+.hero h1{font-size:clamp(40px,5.6vw,76px);font-weight:500;letter-spacing:-.045em;line-height:.98}
+.hero .lede{color:var(--hero-muted);font-size:18px;max-width:52ch}
+.hero .link{color:var(--hero-ink)}
+.cta{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.hero .label{color:var(--accent)}
+.telemetry{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--hero-line);padding-top:20px;gap:24px}
+.telemetry div{display:flex;flex-direction:column;gap:4px}
+.telemetry .k{font-size:14px;color:var(--hero-muted);max-width:26ch;line-height:1.4}
+.telemetry .v{font-size:clamp(26px,2.6vw,36px);font-weight:500;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:1px;box-shadow:0 0 10px var(--accent)}
+@media (min-width:601px) and (max-width:1100px){.hero-copy{max-width:58%}}
+@media (max-width:600px){.hero .cta{flex-direction:column;align-items:flex-start;gap:8px}}
+@media (max-width:820px){
+  .hero .wrap{padding-block:28px 28px;gap:48px}
+  .telemetry{grid-template-columns:repeat(2,1fr)}
+  .hero .wrap{z-index:1}
+}
+
+/* proof strip */
+.proof{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.proof div{padding:40px 24px 40px 0;display:flex;flex-direction:column;gap:8px}
+.proof div + div{padding-left:24px;border-left:1px solid var(--line)}
+.proof .v{font-size:clamp(30px,3.4vw,44px);font-weight:500;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.proof .k{font-size:14px;color:var(--muted);max-width:26ch}
+@media (max-width:820px){.proof{grid-template-columns:1fr 1fr}.proof div:nth-child(3){padding-left:0;border-left:0}.proof div:nth-child(n+3){border-top:1px solid var(--line)}}
+
+/* technology diagram */
+.diagram{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:640px;height:auto}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.cols div{display:flex;flex-direction:column;gap:10px}
+.cols p{color:var(--muted);font-size:16px}
+@media (max-width:820px){.cols{grid-template-columns:1fr;gap:28px}}
+
+/* source */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+@media (max-width:900px){.split{grid-template-columns:1fr;gap:40px}}
+.spec{border-top:1px solid var(--ink)}
+.spec div{display:grid;grid-template-columns:140px 1fr;gap:24px;padding-block:18px;border-bottom:1px solid var(--line)}
+.spec .k{font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums}
+.spec .d{color:var(--muted);font-size:15px}
+.footnote{font-size:14px;color:var(--muted);border-left:2px solid var(--accent);padding-left:14px}
+
+/* sync */
+.sync-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-bottom:48px}
+.sync-steps div{display:flex;flex-direction:column;gap:10px}
+.sync-steps p{color:var(--muted);font-size:16px}
+@media (max-width:820px){.sync-steps{grid-template-columns:1fr;gap:28px}}
+.window{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:56px 24px 20px;display:flex;flex-direction:column;gap:12px}
+.window .track{overflow:visible}
+.mk span{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--ink);white-space:nowrap}
+.mk.rx span{bottom:auto;top:calc(100% + 10px)}
+.window .scale{margin-top:18px}
+/* sync console (legacy) */
+.console{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.arm{padding:32px;display:flex;flex-direction:column;gap:20px;align-items:flex-start}
+.arm + .arm{border-left:1px solid var(--line)}
+.arm button{width:100%;height:120px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 18px var(--sans);letter-spacing:-.01em;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .1s,border-color .1s}
+.arm button small{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
+.arm button.hit{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.arm button.hit small{color:var(--bg)}
+.readline{grid-column:1/-1;border-top:1px solid var(--line);padding:24px 32px;display:flex;flex-direction:column;gap:16px}
+.track{position:relative;height:28px;border-radius:4px;background:var(--bg)}
+.track .win{position:absolute;top:0;bottom:0;left:37.5%;width:25%;background:color-mix(in srgb,var(--ok) 14%,transparent);border-left:1px dashed var(--ok);border-right:1px dashed var(--ok)}
+.track .zero{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--muted)}
+.track .mk{position:absolute;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--accent);left:50%;transform:translateX(-50%);opacity:0;transition:left .25s,opacity .2s}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+#syncOut{font-family:var(--mono);font-size:14px;min-height:44px}
+#syncOut.ok{color:var(--ok)} #syncOut.bad{color:var(--bad)}
+@media (max-width:640px){.arm{padding:20px}.readline{padding:20px}.arm button{height:96px}}
+
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.plan{padding:20px 28px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background .15s,color .15s}
+.plan:not(.hl):hover{background:color-mix(in srgb,var(--ink) 4%,var(--surface))}
+.plan:focus-visible{outline-offset:-4px}
+.pick{margin-top:auto;padding-top:4px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.pick::before{content:"○  Выбрать"}
+.plan.hl .pick::before{content:"●  Выбран"}
+.plan + .plan{border-left:1px solid var(--line)}
+.plan.hl{background:var(--ink);color:var(--bg)}
+.plan.hl .muted,.plan.hl li,.plan.hl .label,.plan.hl .price small{color:color-mix(in srgb,var(--bg) 62%,var(--ink))}
+.slogan{font-size:16px;color:var(--muted);margin-top:-4px}
+.plan.hl .slogan{color:color-mix(in srgb,var(--bg) 75%,var(--ink))}
+.price{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:32px;font-weight:500;letter-spacing:-.03em;font-variant-numeric:tabular-nums;padding-block:2px}
+.price small{font-size:14px;letter-spacing:0;color:var(--muted);font-weight:400}
+.dr{width:30px;height:30px;flex:none;color:var(--accent)}
+.plan ul{margin:0;padding:0;list-style:none;color:var(--muted);font-size:15px;display:flex;flex-direction:column;gap:4px}
+.plan li::before{content:"—  ";color:var(--accent)}
+@media (max-width:900px){.plans{grid-template-columns:1fr}.plan + .plan{border-left:0;border-top:1px solid var(--line)}}
+.pay-note{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.pay-note .dr{width:20px;height:20px}
+.queue{margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.queue{flex-wrap:wrap;align-items:center}
+.queue .pay-note{flex:1 1 220px;min-width:0;margin:0}
+.qrow{display:flex;gap:12px;align-items:flex-end;flex:0 1 auto;min-width:0}
+.qrow label{flex:1 1 150px;min-width:0}
+.qrow select{width:100%;min-width:0}
+.qrow .btn{flex:none;white-space:nowrap}
+@media (max-width:700px){.qrow{flex:1 1 100%}}
+@media (max-width:440px){.qrow{flex-wrap:wrap}.qrow .btn{flex:1 1 100%;justify-content:center}}
+.queue label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.queue select{font:400 16px var(--sans);padding:11px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:160px}
+#qOut{flex-basis:100%;font-family:var(--mono);font-size:14px;min-height:22px}
+
+/* team */
+.team{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.person{display:flex;flex-direction:column;gap:10px}
+.ava{width:100%;aspect-ratio:4/3;max-width:100%;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:flex-end;padding:16px;font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:8px;position:relative;overflow:hidden}
+.ava svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ava .cap{position:relative;z-index:1;background:color-mix(in srgb,var(--surface) 85%,transparent);padding:3px 8px;border-radius:4px;font-size:11px;letter-spacing:.04em}
+.person p{color:var(--muted);font-size:15px}
+@media (max-width:820px){.team{grid-template-columns:1fr}}
+
+/* faq */
+.faq{border-top:1px solid var(--ink)}
+details{border-bottom:1px solid var(--line);padding-block:22px}
+summary{cursor:pointer;font-weight:500;font-size:19px;letter-spacing:-.01em;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
+details[open] summary::after{content:"−"}
+details p{color:var(--muted);margin-top:12px;max-width:66ch}
+
+/* press */
+.press{display:grid;grid-template-columns:1.4fr 1fr;gap:40px}
+@media (max-width:900px){.press{grid-template-columns:1fr}}
+.release{display:flex;flex-direction:column;gap:16px;min-width:0}
+.release h3{font-size:26px;letter-spacing:-.02em}
+.release p{font-size:16px}
+.release .meta{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.posts{display:flex;flex-direction:column;gap:12px;min-width:0}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.post .ch{display:flex;justify-content:space-between;align-items:center}
+.post p{font-size:15px;white-space:pre-line}
+.rel-actions{display:flex;gap:8px;flex-wrap:wrap}
+.more{display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{font:500 14px var(--sans);background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:7px 12px;cursor:pointer}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.copy{font:500 12px var(--mono);background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:5px;padding:5px 10px;cursor:pointer}
+
+footer{border-top:1px solid var(--line);padding-block:40px 56px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;flex-direction:column;gap:12px}
+footer .logo{color:var(--ink)}
+
+/* one screen per section */
+#plans .head{margin-bottom:28px}
+.hero{min-height:calc(100svh - 64px);display:flex}
+.hero .wrap{flex:1;justify-content:space-between}
+section{min-height:calc(100svh - 64px)}
+#how .proof{margin-bottom:40px;border-top:0}
+#how .proof div{padding-block:8px 28px}
+@media (min-width:821px){html{scroll-snap-type:y proximity}.hero,section{scroll-snap-align:start;scroll-margin-top:64px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10.5" ry="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.2" fill="#E8590C"/></symbol>
+  <symbol id="dr" viewBox="0 0 32 32"><rect x="2" y="2" width="28" height="28" rx="8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="4 2.5"/><path d="M12 24V8h6a4.5 4.5 0 0 1 0 9h-8M10 20.5h9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="25" cy="7" r="1.6" fill="currentColor"/><circle cx="7" cy="25" r="1.6" fill="currentColor"/></symbol>
+</svg>
+
+<header class="top"><div class="wrap nav">
+  <a class="logo" href="#top"><svg><use href="#mark"/></svg>Солнцепровод</a>
+  <ul>
+    <li><a href="#how">Технология</a></li>
+    <li><a href="#source">Источник</a></li>
+    <li><a href="#sync">Синхронный пуск</a></li>
+    <li><a href="#plans">Тарифы</a></li>
+    <li><a href="#team">Команда</a></li>
+    <li><a href="#press">Пресса</a></li>
+  </ul>
+  <a class="btn light" href="#plans">Запросить доступ</a>
+</div></header>
+
+<main id="top">
+<div class="hero">
+  <canvas id="plasma" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="label">Наукоград Дубна</div>
+      <h1>Искусственное солнце — по проводу.</h1>
+      <p class="lede">Солнцепровод передаёт солнечную энергию на тысячи километров с КПД более 99%. Технология подтверждена на линии Дубна — Алушта. Следующий источник — плазма термоядерных токамаков: в шесть раз горячее ядра Солнца и без заката.</p>
+      <div class="cta">
+        <a class="btn light" href="#plans">Встать в очередь</a>
+        <a class="link" href="#sync">Синхронный пуск</a>
+      </div>
+    </div>
+    <div class="telemetry" aria-label="Результаты испытаний">
+      <div><span class="v">&gt;99%</span><span class="k">КПД передачи на испытаниях</span></div>
+      <div><span class="v">≈1 350 км</span><span class="k">Дубна — Алушта по прямой, без проводов в земле</span></div>
+    </div>
+  </div>
+</div>
+
+
+<section id="how"><div class="wrap">
+  <div class="head">
+    <div class="label">Технология</div>
+    <div class="stack">
+      <h2>Два устройства. Одна точка. Общее пространство.</h2>
+      <p class="lede">В основе Солнцепровода — теория искривлённых суперструн Зигфрида Зоненхайма (1960-е). Согласно ей, города-побратимы соседствуют в четырёхмерном пространстве-времени. Мы нашли способ этим пользоваться.</p>
+    </div>
+  </div>
+  <div class="cols">
+    <div><span class="label">Передатчик</span><h3>Собирает излучение у источника</h3><p>Устанавливается там, где солнца в избытке: у настоящего, как в Алуште, или у искусственного, как в термоядерной установке. Принимает тепловую и видимую часть спектра и переводит её в бозонное представление. Облачность снижает производительность; в вакуумной камере токамака облаков не бывает.</p></div>
+    <div><span class="label">Бозонное пространство</span><h3>Складывает расстояние</h3><p>Три привычных измерения — не единственные. В дополнительных, бозонных, Дубна и Алушта лежат друг на друге, как края сложенной карты. Энергия переходит из точки в ту же самую точку, и теряться ей по дороге негде: дороги нет.</p></div>
+    <div><span class="label">Приёмник</span><h3>Несёт тепло и свет в дом</h3><p>Ставится в квартире, музее или теплице. Возвращает энергию из бозонного представления в привычное тепло и свет. Запускается в ту же секунду, что и передатчик: иначе устройства не найдут друг друга в общем пространстве. В Дубне наступает рассвет, в Алуште при этом ничего не меняется.</p></div>
+  </div>
+</div></section>
+
+<section id="source"><div class="wrap">
+  <div class="head">
+    <div class="label">Источник</div>
+    <div class="stack">
+      <h2>Настоящее Солнце садится. Искусственное — нет.</h2>
+    </div>
+  </div>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <p class="lede">Крымское солнце надёжно, но у него есть ночь, облака и межсезонье. Термоядерный токамак светит по команде оператора. Ориентиром класса мы считаем китайскую установку EAST в Хэфэе, которую в прессе называют «искусственным солнцем».</p>
+      <p class="footnote">Переговоры с владельцами EAST пока не ведутся. Мы ждём, когда они сами переговорят с нами.</p>
+    </div>
+    <div class="spec">
+      <div><span class="k">1 066 с</span><span class="d">удержания плазмы в H-режиме: мировой рекорд EAST, январь 2025 года</span></div>
+      <div><span class="k">~10⁸ °C</span><span class="d">температура плазмы. Ядро Солнца: около 1,5·10⁷ °C</span></div>
+      <div><span class="k">85 334 с</span><span class="d">оставшаяся часть суток, над которой физикам ещё предстоит поработать</span></div>
+      <div><span class="k">0</span><span class="d">облаков внутри вакуумной камеры за всю историю наблюдений</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="sync"><div class="wrap">
+  <div class="head">
+    <div class="label">Теория синхронности</div>
+    <div class="stack">
+      <h2>Синхронный пуск</h2>
+      <p class="lede">Главное условие работы Солнцепровода — одновременный запуск передатчика и приёмника. Только тогда устройства встречаются в общем пространстве, и энергия переходит из одного в другое.</p>
+    </div>
+  </div>
+  <div class="sync-steps">
+    <div><span class="label">01 · Перекличка</span><h3>Операторы сверяют погоду</h3><p>Алушта и Дубна выходят на связь: «Алушта, это Дубна. Доложите погоду». Если над источником ясно, линия готовится к пуску.</p></div>
+    <div><span class="label">02 · Одновременное включение</span><h3>Одна и та же секунда</h3><p>Передатчик и приёмник включаются одновременно. Допустимое расхождение — 150 миллисекунд, это примерно одно моргание.</p></div>
+    <div><span class="label">03 · Встреча</span><h3>Устройства находят друг друга</h3><p>Совпав по времени, передатчик и приёмник оказываются в одной точке бозонного пространства. Дальше энергия идёт сама, а температура в Дубне начинает расти.</p></div>
+  </div>
+  <p class="footnote">Если опоздать, энергия уходит в бозонное пространство. Она где-то выйдет, но где именно, теория Зоненхайма не уточняет. Поэтому пуск выполняют только операторы линии.</p>
+</div></section>
+
+<section id="plans"><div class="wrap">
+  <div class="head">
+    <div class="label">Тарифы</div>
+    <div class="stack">
+      <h2>Солнце по подписке</h2>
+      <p class="lede">Цены указаны в солнце-часах (СЧАС). 1&nbsp;СЧАС — один час ясного полуденного неба над Алуштой в июле.</p>
+    </div>
+  </div>
+  <div class="plans" role="radiogroup" aria-label="Выбор тарифа">
+    <div class="plan" data-plan="Бахча" role="radio" tabindex="0" aria-checked="false">
+      <span class="label">Для садоводов</span>
+      <h3>Бахча</h3>
+      <p class="slogan">Арбузы растут как на глазах.</p>
+      <div class="price">490 <svg class="dr" viewBox="0 0 32 32" role="img" aria-label="цифровых рублей"><use href="#dr"/></svg><small>/ 100 СЧАС</small></div>
+      <ul><li>Приёмник для теплицы до 6 соток</li><li>Крымские яблоки и сахарные арбузы в Подмосковье</li><li>Работает с мая по сентябрь</li></ul>
+      <span class="pick"></span>
+    </div>
+    <div class="plan hl" data-plan="Дубна" role="radio" tabindex="0" aria-checked="true">
+      <span class="label">Популярный</span>
+      <h3>Дубна</h3>
+      <p class="slogan">Светло как днём. Даже ночью.</p>
+      <div class="price">1 990 <svg class="dr" viewBox="0 0 32 32" role="img" aria-label="цифровых рублей"><use href="#dr"/></svg><small>/ мес</small></div>
+      <ul><li>Безлимитное солнце от побратима</li><li>Резервный канал на искусственное солнце ночью</li><li>Загар без выезда из города</li></ul>
+      <span class="pick"></span>
+    </div>
+    <div class="plan" data-plan="Термояд" role="radio" tabindex="0" aria-checked="false">
+      <span class="label">Для учреждений</span>
+      <h3>Термояд</h3>
+      <p class="slogan">Солнце льётся как из ведра.</p>
+      <div class="price">99 000 <svg class="dr" viewBox="0 0 32 32" role="img" aria-label="цифровых рублей"><use href="#dr"/></svg><small>/ ведро</small></div>
+      <ul><li>Прямое подключение к плазме 10⁸&nbsp;°C</li><li>Рекомендуем ставить приёмник подальше от людей</li><li>Музеям — скидка за поток туристов</li></ul>
+      <span class="pick"></span>
+    </div>
+  </div>
+  <form class="queue" id="qForm">
+    <p class="pay-note"><svg class="dr" viewBox="0 0 32 32" aria-hidden="true"><use href="#dr"/></svg>Оплата принимается только в цифровых рублях. Солнце тоже цифровое.</p>
+    <div class="qrow">
+    <label for="qCity">Город
+      <select id="qCity"><option>Дубна</option><option>Алушта</option><option>Москва</option><option>Санкт-Петербург</option><option>Нью-Йорк</option><option>Хэфэй</option><option>Другой</option></select>
+    </label>
+    <label for="qPlan">Тариф
+      <select id="qPlan"><option>Бахча</option><option selected>Дубна</option><option>Термояд</option></select>
+    </label>
+    <button class="btn" type="submit">Встать в очередь</button>
+    </div>
+    <div id="qOut" role="status" aria-live="polite"></div>
+  </form>
+</div></section>
+
+<section id="team"><div class="wrap">
+  <div class="head">
+    <div class="label">Команда</div>
+    <div class="stack"><h2>Они поделили солнце</h2></div>
+  </div>
+  <div class="team">
+    <div class="person">
+      <div class="ava"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<rect width="400" height="300" fill="var(--ill-bg)"/>
+<g transform="rotate(3 200 150)">
+<rect x="70" y="26" width="270" height="270" fill="var(--paper)" stroke="var(--line)"/>
+<g stroke="var(--paper-ink)" stroke-opacity=".08"><line x1="70" y1="36" x2="340" y2="36"/><line x1="70" y1="46" x2="340" y2="46"/><line x1="70" y1="56" x2="340" y2="56"/><line x1="70" y1="66" x2="340" y2="66"/><line x1="70" y1="76" x2="340" y2="76"/><line x1="70" y1="86" x2="340" y2="86"/><line x1="70" y1="96" x2="340" y2="96"/><line x1="70" y1="106" x2="340" y2="106"/><line x1="70" y1="116" x2="340" y2="116"/><line x1="70" y1="126" x2="340" y2="126"/><line x1="70" y1="136" x2="340" y2="136"/><line x1="70" y1="146" x2="340" y2="146"/><line x1="70" y1="156" x2="340" y2="156"/><line x1="70" y1="166" x2="340" y2="166"/><line x1="70" y1="176" x2="340" y2="176"/><line x1="70" y1="186" x2="340" y2="186"/><line x1="70" y1="196" x2="340" y2="196"/><line x1="70" y1="206" x2="340" y2="206"/><line x1="70" y1="216" x2="340" y2="216"/><line x1="70" y1="226" x2="340" y2="226"/><line x1="70" y1="236" x2="340" y2="236"/><line x1="70" y1="246" x2="340" y2="246"/><line x1="70" y1="256" x2="340" y2="256"/><line x1="70" y1="266" x2="340" y2="266"/><line x1="70" y1="276" x2="340" y2="276"/><line x1="70" y1="286" x2="340" y2="286"/><line x1="80" y1="26" x2="80" y2="296"/><line x1="90" y1="26" x2="90" y2="296"/><line x1="100" y1="26" x2="100" y2="296"/><line x1="110" y1="26" x2="110" y2="296"/><line x1="120" y1="26" x2="120" y2="296"/><line x1="130" y1="26" x2="130" y2="296"/><line x1="140" y1="26" x2="140" y2="296"/><line x1="150" y1="26" x2="150" y2="296"/><line x1="160" y1="26" x2="160" y2="296"/><line x1="170" y1="26" x2="170" y2="296"/><line x1="180" y1="26" x2="180" y2="296"/><line x1="190" y1="26" x2="190" y2="296"/><line x1="200" y1="26" x2="200" y2="296"/><line x1="210" y1="26" x2="210" y2="296"/><line x1="220" y1="26" x2="220" y2="296"/><line x1="230" y1="26" x2="230" y2="296"/><line x1="240" y1="26" x2="240" y2="296"/><line x1="250" y1="26" x2="250" y2="296"/><line x1="260" y1="26" x2="260" y2="296"/><line x1="270" y1="26" x2="270" y2="296"/><line x1="280" y1="26" x2="280" y2="296"/><line x1="290" y1="26" x2="290" y2="296"/><line x1="300" y1="26" x2="300" y2="296"/><line x1="310" y1="26" x2="310" y2="296"/><line x1="320" y1="26" x2="320" y2="296"/><line x1="330" y1="26" x2="330" y2="296"/></g>
+<g fill="none" stroke="var(--paper-ink)" stroke-width="1.4">
+<rect x="110" y="70" width="150" height="92" rx="6"/>
+<rect x="124" y="84" width="66" height="38" rx="2"/>
+<circle cx="224" cy="103" r="15"/><line x1="224" y1="103" x2="233" y2="93"/>
+<circle cx="132" cy="144" r="3"/><circle cx="146" cy="144" r="3"/><circle cx="160" cy="144" r="3"/>
+<path d="M110 92 C 90 92, 84 70, 80 52" stroke-dasharray="5 3"/>
+</g>
+<g stroke="var(--paper-ink)" stroke-width=".9" fill="var(--paper-ink)">
+<line x1="110" y1="176" x2="260" y2="176"/><path d="M110 176 l7 -3 v6z M260 176 l-7 -3 v6z"/>
+<line x1="110" y1="166" x2="110" y2="182"/><line x1="260" y1="166" x2="260" y2="182"/>
+<line x1="276" y1="70" x2="276" y2="162"/><path d="M276 70 l-3 7 h6z M276 162 l-3 -7 h6z"/>
+<line x1="262" y1="70" x2="282" y2="70"/><line x1="262" y1="162" x2="282" y2="162"/>
+<line x1="190" y1="88" x2="206" y2="56"/><line x1="206" y1="56" x2="250" y2="56"/>
+</g>
+<g font-family="Courier New, JetBrains Mono, monospace" fill="var(--paper-ink)">
+<text x="185" y="192" text-anchor="middle" font-size="10">128</text>
+<text x="292" y="120" font-size="10">82</text>
+<text x="210" y="52" font-size="9">экран КПД</text>
+<text x="80" y="46" font-size="9">ввод</text>
+</g>
+<g fill="none" stroke="var(--paper-ink)" stroke-width="1.2"><rect x="168" y="196" width="160" height="60"/><line x1="168" y1="216" x2="328" y2="216"/><line x1="168" y1="236" x2="328" y2="236"/><line x1="280" y1="216" x2="280" y2="256"/></g>
+<g font-family="Courier New, JetBrains Mono, monospace" fill="var(--paper-ink)">
+<text x="174" y="211" font-size="10" font-weight="700">Приёмник СП-1</text>
+<text x="174" y="230" font-size="8">Лучезарский Я.</text>
+<text x="174" y="250" font-size="8">Сборочный чертёж</text>
+<text x="286" y="230" font-size="8">М 1:2</text>
+<text x="286" y="250" font-size="8">Лист 1</text>
+</g>
+<circle cx="224" cy="103" r="22" fill="none" stroke="var(--accent)" stroke-width="1.6" opacity=".85"/>
+</g>
+</svg><span class="cap">Чертёж приёмника · Дубна</span></div>
+      <span class="label">Основатель, физик</span>
+      <h3>Ярослав Лучезарский</h3>
+      <p>Мечтал перевести родной город на солнечную энергию. За годы испытаний ему открылась теория синхронности.</p>
+    </div>
+    <div class="person">
+      <div class="ava"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<rect width="400" height="300" fill="var(--ill-bg)"/>
+<g transform="rotate(-4 200 150)">
+<rect x="96" y="22" width="214" height="280" fill="var(--paper)" stroke="var(--line)"/>
+<g font-family="Courier New, JetBrains Mono, monospace" fill="var(--paper-ink)">
+<text x="203" y="52" text-anchor="middle" font-size="11" font-weight="700">ZUR THEORIE DER GEKRÜMMTEN</text>
+<text x="203" y="66" text-anchor="middle" font-size="11" font-weight="700">SUPERSTRINGS</text>
+<text x="203" y="82" text-anchor="middle" font-size="9">S. Sonnenheim · 1963</text>
+<text x="118" y="132" font-size="14">E = ħω · δ(t₁ − t₂)</text>
+<text x="118" y="190" font-size="13">Σ B(Dubna) ≡ B(Alušta)</text>
+</g>
+<g stroke="var(--paper-ink)" stroke-opacity=".35" stroke-width="2">
+<line x1="116" y1="100" x2="290" y2="100"/><line x1="116" y1="110" x2="270" y2="110"/>
+<line x1="116" y1="150" x2="292" y2="150"/><line x1="116" y1="160" x2="250" y2="160"/><line x1="116" y1="170" x2="282" y2="170"/>
+<line x1="116" y1="208" x2="290" y2="208"/><line x1="116" y1="218" x2="236" y2="218"/>
+</g>
+<circle cx="262" cy="248" r="24" fill="none" stroke="#9A6A2E" stroke-opacity=".35" stroke-width="5"/>
+</g>
+<path d="M118 141 q75 7 152 -1" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" opacity=".8" transform="rotate(-4 200 150)"/>
+</svg><span class="cap">Рукопись 1963 года</span></div>
+      <span class="label">Теоретическая база</span>
+      <h3>Зигфрид Зоненхайм</h3>
+      <p>Немецкий учёный, автор теории искривлённых суперструн. Опубликовал её в 1960-х; научное сообщество её до сих пор не прочитало.</p>
+    </div>
+    <div class="person">
+      <div class="ava"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs><path id="stc" d="M 0 0 m -30 0 a 30 30 0 1 1 60 0 a 30 30 0 1 1 -60 0"/></defs>
+<rect width="400" height="300" fill="var(--ill-bg)"/>
+<g transform="rotate(-3 200 150)">
+<rect x="80" y="24" width="236" height="280" fill="var(--paper)" stroke="var(--line)"/>
+<g font-family="Courier New, JetBrains Mono, monospace" fill="var(--paper-ink)">
+<text x="198" y="52" text-anchor="middle" font-size="11" font-weight="700">ЖУРНАЛ ПОГОДЫ</text>
+<text x="198" y="66" text-anchor="middle" font-size="9">Филиал Алушта · июль</text>
+<text x="96" y="86" font-size="8">ДАТА</text><text x="146" y="86" font-size="8">НЕБО</text><text x="300" y="86" font-size="8" text-anchor="end">ПЕРЕДАНО</text>
+<g font-size="10"><text x="96" y="108">12.07</text><text x="146" y="108">ясно</text><text x="300" y="108" text-anchor="end">99,4%</text><text x="96" y="132">13.07</text><text x="146" y="132">ясно</text><text x="300" y="132" text-anchor="end">99,6%</text><text x="96" y="156">14.07</text><text x="146" y="156">малооблачно</text><text x="300" y="156" text-anchor="end">98,9%</text><text x="96" y="180">15.07</text><text x="146" y="180">ясно</text><text x="300" y="180" text-anchor="end">99,5%</text><text x="96" y="204">16.07</text><text x="146" y="204">ясно</text><text x="300" y="204" text-anchor="end">99,7%</text><text x="96" y="228">17.07</text><text x="146" y="228">ясно</text><text x="300" y="228" text-anchor="end">99,6%</text></g>
+</g>
+<g stroke="var(--paper-ink)" stroke-opacity=".3" stroke-width="1"><line x1="90" y1="92" x2="306" y2="92" stroke-opacity=".6"/><line x1="90" y1="114" x2="306" y2="114"/><line x1="90" y1="138" x2="306" y2="138"/><line x1="90" y1="162" x2="306" y2="162"/><line x1="90" y1="186" x2="306" y2="186"/><line x1="90" y1="210" x2="306" y2="210"/><line x1="90" y1="234" x2="306" y2="234"/></g>
+<g transform="translate(262 262) rotate(-14)" opacity=".75">
+<circle r="34" fill="none" stroke="#C2410C" stroke-width="2"/><circle r="22" fill="none" stroke="#C2410C" stroke-width="1.2"/>
+<text font-family="Courier New, monospace" font-size="7.5" fill="#C2410C" letter-spacing="1"><textPath href="#stc">СОЛНЦЕПРОВОД · ФИЛИАЛ АЛУШТА ·</textPath></text>
+<text y="3" text-anchor="middle" font-family="Courier New, monospace" font-size="9" font-weight="700" fill="#C2410C">ЯСНО</text>
+</g>
+</g>
+</svg><span class="cap">Журнал погоды · Алушта</span></div>
+      <span class="label">Филиал</span>
+      <h3>Испытательная площадка в Алуште</h3>
+      <p>Излучает погоду. Крымчане не против поделиться с Дубной природным богатством.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="head">
+    <div class="label">Вопросы</div>
+    <div class="faq">
+      <details><summary>Почему именно Дубна?</summary><p>В Дубне работает Объединённый институт ядерных исследований, где синтезировали сверхтяжёлые элементы, а 105-й элемент таблицы Менделеева назвали дубнием в честь города. На этом фоне передать немного солнца по проводу — задача скромная. ОИЯИ к Солнцепроводу отношения не имеет, но соседство обязывает.</p></details>
+      <details><summary>Почему именно города-побратимы?</summary><p>Между побратимами существует мощная связь. В четырёхмерном пространстве-времени Дубна и Алушта находятся рядом, так что передача тепла идёт без проблем. Для остальных городов необходимо выбрать побратима при подключении.</p></details>
+      <details><summary>Что будет, если запустить приёмник позже передатчика?</summary><p>Энергия уйдёт в бозонное пространство. Она где-то выйдет, но где именно, теория Зоненхайма не уточняет.</p></details>
+      <details><summary>А в Алуште солнца станет меньше?</summary><p>Нет. Мы забираем только излишки, которые всё равно ушли бы на загар туристов.</p></details>
+      <details><summary>Не опасно ли подключаться к плазме в сто миллионов градусов?</summary><p>Приёмник выдаёт тепло дозированно. Тариф «Термояд» мы всё же не рекомендуем для квартир.</p></details>
+      <details><summary>Дадут ли вам Нобелевскую премию?</summary><p>Вряд ли. Но нам говорили, что отдают должное за смелость.</p></details>
+      <details><summary>Когда запуск?</summary><p>Запуск в полном объёме запланирован на 1 апреля.</p></details>
+    </div>
+  </div>
+</div></section>
+
+<section id="press"><div class="wrap">
+  <div class="head">
+    <div class="label">Пресса</div>
+    <div class="stack">
+      <h2>Пресс-центр</h2>
+      <p class="lede">Тексты можно использовать без согласования. Ссылка на сайт приветствуется.</p>
+    </div>
+  </div>
+  <div class="press">
+    <article class="release" id="releaseText">
+      <div class="meta">Пресс-релиз · Дубна</div>
+      <h3>«Солнцепровод» из Дубны готовится перейти с крымского солнца на термоядерное</h3>
+      <p>Дубнинская компания «Солнцепровод», известная испытаниями беспроводной передачи солнечного тепла между Дубной и Алуштой, объявила о следующем этапе проекта. В качестве источника энергии компания рассматривает термоядерные установки-токамаки, которые в мире называют «искусственными солнцами».</p>
+      <p>По данным компании, на линии Дубна — Алушта КПД передачи превысил 99%. Технология опирается на теорию синхронности: передатчик и приёмник должны быть запущены одновременно, тогда в дополнительных бозонных измерениях они оказываются в одной точке.</p>
+      <div class="more" id="relMore" hidden>
+      <p>«Крымское солнце нас не подвело, но оно заходит каждый вечер, — говорит основатель компании физик Ярослав Лучезарский. — Плазма в токамаке горячее ядра Солнца примерно в шесть раз. Когда физики научатся держать её сутки напролёт, у Дубны будет солнце круглый год. Мы готовы подключиться в тот же день».</p>
+      <p>Ориентиром компания называет китайский токамак EAST, который в январе 2025 года удерживал плазму в H-режиме 1066 секунд. Переговоры с владельцами установки не ведутся.</p>
+      <p>Запуск Солнцепровода в полном объёме запланирован на 1 апреля.</p>
+      <p class="meta" style="text-transform:none;letter-spacing:0;font-size:13px">О компании: «Солнцепровод» — инновационная компания из наукограда Дубны. Разрабатывает системы передачи солнечной энергии на основе теории искривлённых суперструн З. Зоненхайма. Филиал работает в Алуште. Контакт для СМИ: Ярослав Лучезарский.</p>
+      </div>
+      <div class="rel-actions"><button class="copy" type="button" id="relToggle" aria-expanded="false" aria-controls="relMore">Читать полностью</button><button class="copy" type="button" data-copy="releaseText">Копировать релиз</button></div>
+    </article>
+    <div class="posts">
+      <div class="tabs" role="tablist"><button type="button" role="tab" class="tab on" data-tab="0" aria-selected="true">Telegram</button><button type="button" role="tab" class="tab" data-tab="1" aria-selected="false">ВКонтакте</button><button type="button" role="tab" class="tab" data-tab="2" aria-selected="false">Короткий пост</button></div>
+      <div class="post"><div class="ch"><span class="label">Telegram</span><button class="copy" type="button" data-copy="p1">Копировать</button></div>
+        <p id="p1">☀️ В Дубне собираются отапливать город термоядом.
+
+Компания «Солнцепровод», которая уже «передавала» солнце из Алушты с КПД 99%, теперь смотрит на токамаки. Плазма там в 6 раз горячее ядра Солнца и не садится вечером.
+
+Запуск — 1 апреля. Как работает синхронный пуск, рассказано на сайте.</p></div>
+      <div class="post" hidden><div class="ch"><span class="label">ВКонтакте</span><button class="copy" type="button" data-copy="p2">Копировать</button></div>
+        <p id="p2">Садоводы Подмосковья, внимание. Тариф «Бахча» от Солнцепровода обещает крымские арбузы на шести сотках. Принцип простой: Дубна и Алушта — побратимы, а значит, в четырёхмерном пространстве живут по соседству.
+
+В СНТ «Восход» и «Репка» арбузам тесновато, поэтому там будут вызревать инжир и черешня. На «Репке», возможно, вырастет репка размером с арбуз.</p></div>
+      <div class="post" hidden><div class="ch"><span class="label">Короткий пост</span><button class="copy" type="button" data-copy="p3">Копировать</button></div>
+        <p id="p3">Искусственное солнце — по проводу. Солнцепровод из Дубны: КПД >99%, теория Зоненхайма, запуск 1 апреля.</p></div>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="logo"><svg><use href="#mark"/></svg>Солнцепровод · Дубна — Алушта</div>
+  <p>Солнцепровод — научно-фантастический проект и первоапрельская шутка, основанная на сюжете «Новостей 360». Теория Зоненхайма и бозонная передача энергии выдуманы. Проект не связан с EAST, Институтом физики плазмы АН Китая, ОИЯИ и другими научными организациями. Факты о рекордах EAST взяты из открытых источников.</p>
+</div></footer>
+
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // plasma torus
+  const cv=document.getElementById('plasma'),ctx=cv.getContext('2d');
+  let W=0,H=0;
+  function size(){const d=Math.min(2,devicePixelRatio||1),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
+  size();addEventListener('resize',()=>{size();if(reduce)frame()});
+  function sprite(rgb,s){const c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+    gr.addColorStop(0,`rgba(${rgb},.55)`);gr.addColorStop(.35,`rgba(${rgb},.18)`);gr.addColorStop(1,`rgba(${rgb},0)`);g.fillStyle=gr;g.fillRect(0,0,s,s);return c}
+  const SD={p:sprite('255,178,120',64),c:sprite('255,240,210',32),w:sprite('255,215,140',48)},SL={p:sprite('232,120,200',64),c:sprite('255,170,130',32),w:sprite('255,190,110',48)};
+  let sPink=SD.p,sCore=SD.c,sWarm=SD.w,LIGHT=false,ADD='lighter',GREY='rgba(140,146,156,';
+  function mode(){LIGHT=getComputedStyle(document.documentElement).getPropertyValue('--hero-light').trim()==='1';const S=LIGHT?SL:SD;sPink=S.p;sCore=S.c;sWarm=S.w;ADD=LIGHT?'source-over':'lighter';GREY=LIGHT?'rgba(40,55,90,':'rgba(140,146,156,'}
+  mode();matchMedia('(prefers-color-scheme: dark)').addEventListener('change',mode);new MutationObserver(mode).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  const city=[[-.78,.13,.22],[-.64,.1,.36],[-.52,.16,.26],[-.34,.09,.5],[-.24,.14,.3],[-.08,.11,.42],[.05,.18,.24],[.25,.1,.55],[.36,.15,.32],[.53,.12,.4],[.66,.12,.2]].map(([x,w,h])=>({x,w,h,win:Array.from({length:12},()=>Math.random())}));
+  const beam=Array.from({length:7},(_,i)=>i/7);
+  const N=1800,pts=[];for(let i=0;i<N;i++){const core=Math.random()<.55;pts.push({u:Math.random()*6.283,v:Math.random()*6.283,rr:core?Math.random()*.35:.35+Math.random()*.65,warm:Math.random()<.05,sp:.0016+Math.random()*.0028,core})}
+  let t=0;const copyEl=document.querySelector('.hero-copy'),ctaEl=document.querySelector('.hero .cta');
+  const flares=Array.from({length:11},(_,i)=>({a:i/11*6.283+Math.random()*.4,w:.22+Math.random()*.3,h:.12+Math.random()*.38,ph:Math.random()*6.283,sp:.008+Math.random()*.012}));
+  function miniSun(x,y,s){
+    ctx.save();ctx.globalCompositeOperation=ADD;
+    const halo=ctx.createRadialGradient(x,y,s*.6,x,y,s*3.4);halo.addColorStop(0,'rgba(255,150,60,.45)');halo.addColorStop(.4,'rgba(255,100,30,.14)');halo.addColorStop(1,'rgba(255,90,20,0)');
+    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,s*3.4,0,7);ctx.fill();
+    // prominences: plasma loops rising from the surface
+    flares.forEach(f=>{const ph=reduce?f.ph:f.ph+t*f.sp,lift=s*(1+f.h*(.55+.45*Math.sin(ph))),a=f.a+(reduce?0:t*.0015);
+      const a1=a-f.w/2,a2=a+f.w/2,x1=x+Math.cos(a1)*s*.95,y1=y+Math.sin(a1)*s*.95,x2=x+Math.cos(a2)*s*.95,y2=y+Math.sin(a2)*s*.95,mx=x+Math.cos(a)*(s+lift),my=y+Math.sin(a)*(s+lift);
+      const vis=Math.max(0,Math.sin(ph*.5));if(vis<.02)return;
+      [[8,255,100,30,.12],[3.2,255,150,60,.28],[1.2,255,210,150,.4]].forEach(([lw,R1,G1,B1,al])=>{ctx.strokeStyle=`rgba(${R1},${G1},${B1},${al*vis})`;const c=0;ctx.lineWidth=lw*s/20;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.quadraticCurveTo(mx,my,x2,y2);ctx.stroke()})});
+    ctx.restore();
+    // body with churning surface
+    const body=ctx.createRadialGradient(x-s*.3,y-s*.3,s*.1,x,y,s);body.addColorStop(0,'#FFF6DC');body.addColorStop(.45,'#FFC15A');body.addColorStop(.85,'#F06A12');body.addColorStop(1,'#C2410C');
+    ctx.fillStyle=body;ctx.beginPath();ctx.arc(x,y,s,0,7);ctx.fill();
+    ctx.save();ctx.beginPath();ctx.arc(x,y,s,0,7);ctx.clip();ctx.globalCompositeOperation='lighter';
+    for(let i=0;i<9;i++){const a=i*2.4+(reduce?0:t*.01*(i%2?1:-1)),d=s*(.25+.5*((i*37)%10)/10),bx=x+Math.cos(a)*d,by=y+Math.sin(a)*d,br=s*(.18+.1*Math.sin(t*.03+i));
+      const g=ctx.createRadialGradient(bx,by,0,bx,by,br);g.addColorStop(0,'rgba(255,240,200,.35)');g.addColorStop(1,'rgba(255,240,200,0)');ctx.fillStyle=g;ctx.fillRect(bx-br,by-br,br*2,br*2)}
+    ctx.restore();
+  }
+  function bez(p0,p1,p2,p3,t){const u=1-t;return[u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]}
+  function tile(x,y,w){const h=w*1.18;ctx.fillStyle=LIGHT?'rgba(255,255,255,.75)':'rgba(255,255,255,.06)';ctx.strokeStyle=GREY+'.55)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(x-w/2,y,w,h,3):ctx.rect(x-w/2,y,w,h);ctx.fill();ctx.stroke();
+    ctx.fillStyle=GREY+'.75)';ctx.textAlign='left';ctx.font=`500 ${w*.2}px JetBrains Mono, monospace`;ctx.fillText('105',x-w/2+w*.1,y+w*.26);
+    ctx.textAlign='center';ctx.fillStyle=GREY+'1)';ctx.font=`600 ${w*.44}px Onest, system-ui, sans-serif`;ctx.fillText('Db',x,y+h*.66);
+    ctx.fillStyle=GREY+'.75)';ctx.font=`500 ${w*.17}px Onest, system-ui, sans-serif`;ctx.fillText('Дубна',x,y+h*.9);return h}
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const cr=cv.getBoundingClientRect(),wide=W>600;let R,tx,ty;
+    if(wide){const c=copyEl.getBoundingClientRect(),room=W-(c.right-cr.left);R=Math.max(40,Math.min(room*.26,H*.12,110));tx=(c.right-cr.left)+room/2;const tall=R*2.6+60;ty=(c.top-cr.top)+Math.max(0,(c.height-tall)/2)+R*.6}
+    else{const c=ctaEl.getBoundingClientRect();R=Math.min(W*.1,40);tx=W-20-R*1.5;ty=(c.top-cr.top)+R*.6}
+    const
+      r=R*.36,tilt=1.18,ct=Math.cos(tilt),st=Math.sin(tilt),k=R/110;
+    // vessel wireframe
+    ctx.strokeStyle=LIGHT?'rgba(40,60,100,.10)':'rgba(190,205,235,.10)';ctx.lineWidth=1;
+    for(let q=0;q<16;q++){const u=q/16*6.283;ctx.beginPath();for(let j=0;j<=24;j++){const v=j/24*6.283,rr=r*1.25,x=(R+rr*Math.cos(v))*Math.cos(u),y=(R+rr*Math.cos(v))*Math.sin(u),z=rr*Math.sin(v);const px=tx+x,py=ty+y*ct-z*st;j?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.stroke()}
+    // plasma ring
+    ctx.globalCompositeOperation=ADD;
+    for(const p of pts){
+      if(!reduce){p.u+=p.sp;p.v+=p.sp*3.1}
+      const rr=r*p.rr*.8,x=(R+rr*Math.cos(p.v))*Math.cos(p.u),y=(R+rr*Math.cos(p.v))*Math.sin(p.u),z=rr*Math.sin(p.v);
+      const px=tx+x,py=ty+y*ct-z*st,depth=(y*st+z*ct)/R,sz=(p.core?11:22)*(1+depth*.2)*Math.max(.5,k);
+      ctx.globalAlpha=p.core?.55:.2;
+      ctx.drawImage(p.core?sCore:(p.warm?sWarm:sPink),px-sz/2,py-sz/2,sz,sz);
+    }
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+    // the artificial sun in the middle
+    miniSun(tx,ty,R*.2);
+    // wire to Dubna
+    const dx=tx,Rc=R*.9,base=ty+R*1.95,roof=base-Rc*.55;
+    const P0=[tx,ty+R*.6],P1=[tx+R*.55,ty+R*1.0],P2=[tx-R*.55,roof-R*.35],P3=[tx,roof-6];
+    ctx.strokeStyle='rgba(232,89,12,.45)';ctx.setLineDash([3,5]);ctx.lineWidth=1.2;ctx.beginPath();
+    for(let i=0;i<=40;i++){const q=bez(P0,P1,P2,P3,i/40);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])}ctx.stroke();ctx.setLineDash([]);
+    beam.forEach((b,i)=>{if(!reduce)beam[i]=(b+.004)%1;const q=bez(P0,P1,P2,P3,beam[i]);ctx.beginPath();ctx.arc(q[0],q[1],wide?2.4:1.8,0,7);ctx.fillStyle='rgba(255,138,60,'+(.4+.55*Math.sin(beam[i]*3.14))+')';ctx.fill()});
+    // Dubna skyline
+    const glow=ctx.createRadialGradient(dx,base,0,dx,base,Rc*.9);glow.addColorStop(0,'rgba(255,170,90,.25)');glow.addColorStop(1,'rgba(255,170,90,0)');ctx.fillStyle=glow;ctx.fillRect(dx-Rc,base-Rc,Rc*2,Rc);
+    city.forEach(bd=>{const bx=dx+bd.x*Rc*.75,bw=bd.w*Rc*.75,bh=bd.h*Rc;ctx.fillStyle=GREY+(LIGHT?'.18)':'.22)');ctx.fillRect(bx,base-bh,bw,bh);
+      const cols=2,rows=Math.max(2,Math.floor(bh/(Rc*.08))),ww=bw/(cols*2+1),wh=Math.max(1.5,Rc*.03);
+      for(let r2=0;r2<rows;r2++)for(let c=0;c<cols;c++){const kk=bd.win[(r2*cols+c)%12];if(kk<.45)continue;ctx.fillStyle='rgba(255,170,90,'+(.5+.45*Math.abs(Math.sin(t/90+kk*9)))+')';ctx.fillRect(bx+ww*(1+c*2),base-bh+Rc*.05+r2*(bh-Rc*.07)/rows,ww,wh)}});
+    ctx.fillStyle=GREY+'.45)';ctx.fillRect(dx-Rc*.75,base,Rc*1.5,1);
+    tile(dx,base+10,Math.max(28,Math.min(44,R*.42)));
+    t++;if(!reduce)requestAnimationFrame(frame);
+  }
+  frame();
+
+  // plan cards <-> select
+  const planSel=document.getElementById('qPlan'),cards=[...document.querySelectorAll('.plan[data-plan]')];
+  function choose(name){cards.forEach(c=>{const on=c.dataset.plan===name;c.classList.toggle('hl',on);c.setAttribute('aria-checked',on)});planSel.value=name}
+  cards.forEach(c=>{c.addEventListener('click',()=>choose(c.dataset.plan));c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(c.dataset.plan)}})});
+  planSel.addEventListener('change',()=>choose(planSel.value));
+
+  // queue (nothing is sent)
+  const qOut=document.getElementById('qOut');
+  document.getElementById('qForm').addEventListener('submit',e=>{e.preventDefault();
+    const c=document.getElementById('qCity').value,p=document.getElementById('qPlan').value,n=(3000+Math.floor(Math.random()*7000)).toLocaleString('ru-RU');
+    const tw={'Дубна':'Алушта','Алушта':'Дубна','Хэфэй':'Дубна'}[c]||'выбирается при подключении';
+    qOut.textContent='Заявка № '+n+' · '+c+' · тариф «'+p+'» · побратим: '+tw+' · подключение 1 апреля';});
+
+  // press: release toggle + post tabs
+  const relT=document.getElementById('relToggle'),relM=document.getElementById('relMore');
+  relT.addEventListener('click',()=>{relM.hidden=!relM.hidden;relT.setAttribute('aria-expanded',!relM.hidden);relT.textContent=relM.hidden?'Читать полностью':'Свернуть'});
+  const tabs=[...document.querySelectorAll('.tab')],posts=[...document.querySelectorAll('.post')];
+  tabs.forEach(t=>t.addEventListener('click',()=>{const i=+t.dataset.tab;tabs.forEach((x,j)=>{x.classList.toggle('on',j===i);x.setAttribute('aria-selected',j===i)});posts.forEach((x,j)=>x.hidden=j!==i)}));
+
+  // copy
+  document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{
+    const el=document.getElementById(b.dataset.copy),parts=[...el.querySelectorAll('h3,p')];
+    const txt=parts.length?parts.map(x=>x.textContent.trim()).join('\n\n'):el.innerText;
+    const done=()=>{const o=b.textContent;b.textContent='Скопировано';setTimeout(()=>b.textContent=o,1500)};
+    navigator.clipboard.writeText(txt).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)});
+  }));
+})();
+</script>
+
+</body>
+</html>
